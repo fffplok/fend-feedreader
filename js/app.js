@@ -12,11 +12,11 @@ var allFeeds = [
         name: 'Udacity Blog',
         url: 'http://blog.udacity.com/feeds/posts/default?alt=rss'
     }, {
-        name: 'CSS Tricks',
+        name: '9', //'CSS Tricks',
         url: 'http://css-tricks.com/feed'
     }, {
         name: 'HTML5 Rocks',
-        url: 'http://feeds.feedburner.com/html5rocks'
+        url:  'http://feeds.feedburner.com/html5rocks'
     }, {
         name: 'Linear Digressions',
         url: 'http://feeds.feedburner.com/udacity-linear-digressions'
