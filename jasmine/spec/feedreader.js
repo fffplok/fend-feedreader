@@ -73,6 +73,30 @@ $(function() {
           * clicked and does it hide when clicked again.
           */
 
+    describe('The menu', function(){
+        var $body = $('body'),
+            $menuIcon = $('.menu-icon-link');
+
+        it('is revealed when menu icon clicked', function(){
+            // menu is not visible when body has class 'menu-hidden'.
+            // first ensure that body has class 'menu-hidden'.
+            // then trigger click event on the menu icon, which should remove menu-hidden class from body.
+            if (!$body.hasClass('menu-hidden')) $body.addClass('menu-hidden');
+            $menuIcon.click();
+            expect($body.hasClass('menu-hidden')).toBe(false);
+        });
+
+        it('is hidden when menu icon clicked', function(){
+            // menu is not visible when body has no css class.
+            // first ensure that body has no css class.
+            // then trigger click event on the menu icon, which should add menu-hidden class to body.
+            if ($body.hasClass('menu-hidden')) $body.removeClass('menu-hidden');
+            $menuIcon.click();
+
+            expect($body.hasClass('menu-hidden')).toBe(true);
+        });
+    });
+
     /* TODO: Write a new test suite named "Initial Entries" */
 
         /* TODO: Write a test that ensures when the loadFeed
