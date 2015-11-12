@@ -34,8 +34,8 @@ $(function() {
         it('have appropriate URLs', function() {
             var urlsOk = true;
 
-            allFeeds.forEach(function(curVal) {
-                if (!(typeof(curVal.url) === 'string' && curVal.url.length)) urlsOk = false;
+            allFeeds.forEach(function(feed) {
+                if (!(typeof(feed.url) === 'string' && feed.url.length)) urlsOk = false;
             });
 
             expect(urlsOk).toBe(true);
@@ -49,8 +49,8 @@ $(function() {
         it('have names', function() {
             var namesOk = true;
 
-            allFeeds.forEach(function(curVal) {
-                if (!(typeof(curVal.name) === 'string' && curVal.name.length)) namesOk = false;
+            allFeeds.forEach(function(feed) {
+                if (!(typeof(feed.name) === 'string' && feed.name.length)) namesOk = false;
             });
 
             expect(namesOk).toBe(true);
@@ -77,23 +77,40 @@ $(function() {
         var $body = $('body'),
             $menuIcon = $('.menu-icon-link');
 
-        it('is revealed when menu icon clicked', function(){
-            // menu is not visible when body has class 'menu-hidden'.
-            // first ensure that body has class 'menu-hidden'.
-            // then trigger click event on the menu icon, which should remove menu-hidden class from body.
+        // make sure ui is restored after each test. initially, menu is hidden
+        afterEach(function(){
             if (!$body.hasClass('menu-hidden')) $body.addClass('menu-hidden');
-            $menuIcon.click();
-            expect($body.hasClass('menu-hidden')).toBe(false);
         });
 
-        it('is hidden when menu icon clicked', function(){
-            // menu is not visible when body has no css class.
-            // first ensure that body has no css class.
-            // then trigger click event on the menu icon, which should add menu-hidden class to body.
-            if ($body.hasClass('menu-hidden')) $body.removeClass('menu-hidden');
+        it('is revealed when menu icon clicked', function(done){
+            // body will initially have menu-hidden class. so left position of menu should be negative
+            // trigger click event on the menu icon, which should remove menu-hidden class from body.
             $menuIcon.click();
+            expect($body.hasClass('menu-hidden')).toBe(false);
 
+            // the css indicates a transition lasting 0.2s to shift menu left the width of the menu.
+            // use setTimeout to wait til done then verify left position of menu becomes 0
+            setTimeout(function(){
+                expect($body.find('.menu').offset().left).toBe(0);
+                done();
+            }, 250);
+        });
+
+        it('is hidden when menu icon clicked', function(done){
+            // first ensure that body doesn't have the menu-hidden class.
+            $body.removeClass('menu-hidden');
+
+            // trigger click event on the menu icon, which should add menu-hidden class to body.
+            $menuIcon.click();
             expect($body.hasClass('menu-hidden')).toBe(true);
+
+            // verify that right position of menu is now 0 or less
+            // when shifted left, the menu is actually farther left than it's width
+            setTimeout(function(){
+                var $menu = $body.find('.menu');
+                expect($menu.offset().left + $menu.width() <= 0).toBe(true);
+                done();
+            }, 250);
         });
     });
 
@@ -106,10 +123,47 @@ $(function() {
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
 
+    describe('Initial Entries', function(){
+        beforeEach(function(done){
+            loadFeed(0, done);
+        });
+
+        it('are populated by at least one element', function(){
+            expect($('.feed').children().length).toBeGreaterThan(0);
+        });
+    });
+
     /* TODO: Write a new test suite named "New Feed Selection"
 
         /* TODO: Write a test that ensures when a new feed is loaded
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
+
+    describe('New Feed Selection', function(){
+        // compare the strings that contain feed titles and verify change
+        var first, second;
+
+        beforeEach(function(done){
+            loadFeed(0, function() {
+                first = $('.feed').find('h2').text();
+            });
+
+            loadFeed(1, function() {
+                second = $('.feed').find('h2').text();
+                done();
+            });
+        });
+
+        // make sure ui is restored. initially, allFeeds[0] is loaded
+        afterAll(function(){
+            loadFeed(0);
+        });
+
+        it('changes from prior selected feed', function(){
+            expect(first).not.toEqual(second);
+        });
+    });
+
+
 }());
