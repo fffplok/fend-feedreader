@@ -75,14 +75,24 @@ $(function() {
 
     describe('The menu', function(){
         var $body = $('body'),
-            $menuIcon = $('.menu-icon-link');
+            $menuIcon = $body.find('.menu-icon-link'),
+            $menu = $body.find('.menu');
+
 
         // make sure ui is restored after each test. initially, menu is hidden
         afterEach(function(){
             if (!$body.hasClass('menu-hidden')) $body.addClass('menu-hidden');
         });
 
-        it('is revealed when menu icon clicked', function(done){
+        it('is hidden by default', function(){
+            expect($body.hasClass('menu-hidden')).toBe(true);
+
+            // verify that right position of menu is 0 or less
+            // when shifted left, the menu is actually farther left than it's width
+            expect($menu.offset().left + $menu.width() <= 0).toBe(true);
+        });
+
+        it('is revealed when menu icon clicked (from hidden state)', function(done){
             // body will initially have menu-hidden class. so left position of menu should be negative
             // trigger click event on the menu icon, which should remove menu-hidden class from body.
             $menuIcon.click();
@@ -91,12 +101,12 @@ $(function() {
             // the css indicates a transition lasting 0.2s to shift menu left the width of the menu.
             // use setTimeout to wait til done then verify left position of menu becomes 0
             setTimeout(function(){
-                expect($body.find('.menu').offset().left).toBe(0);
+                expect($menu.offset().left).toBe(0);
                 done();
             }, 250);
         });
 
-        it('is hidden when menu icon clicked', function(done){
+        it('is hidden when menu icon clicked (from revealed state)', function(done){
             // first ensure that body doesn't have the menu-hidden class.
             $body.removeClass('menu-hidden');
 
@@ -105,9 +115,7 @@ $(function() {
             expect($body.hasClass('menu-hidden')).toBe(true);
 
             // verify that right position of menu is now 0 or less
-            // when shifted left, the menu is actually farther left than it's width
             setTimeout(function(){
-                var $menu = $body.find('.menu');
                 expect($menu.offset().left + $menu.width() <= 0).toBe(true);
                 done();
             }, 250);
